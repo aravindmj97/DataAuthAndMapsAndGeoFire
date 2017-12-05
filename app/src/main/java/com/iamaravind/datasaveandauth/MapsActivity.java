@@ -35,6 +35,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     Location mLastLocation;
     LocationRequest mLocationRequest;
    // Firebase mFire;
+   boolean flag=true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,6 +93,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 GeoFire geoFire = new GeoFire(ref);
                // geoFire.setLocation(ref.push().getKey(), new GeoLocation(location.getLatitude(), location.getLongitude()));
                 geoFire.setLocation(userId, new GeoLocation(location.getLatitude(), location.getLongitude()));
+                double val;
+                //val = distFrom(10.0377826 ,76.3292726, location.getLatitude(), location.getLongitude());
+                float[] results = new float[1];
+                location.distanceBetween(10.0377826 ,76.3292726, location.getLatitude(), location.getLongitude(), results);
+              //  Toast.makeText(MapsActivity.this, "Result is this = "+results[0],Toast.LENGTH_SHORT).show();
+                if(results[0]<30)
+                {
+                    if(flag){Toast.makeText(MapsActivity.this, "Within The Radius",Toast.LENGTH_SHORT).show(); flag=false;}
+                }
+                else {
+                    if(!flag){
+                    Toast.makeText(MapsActivity.this, "NOT Within The Radius",Toast.LENGTH_SHORT).show();
+                    flag = true;}
+                }
             }
         });
     }
@@ -155,5 +170,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         GeoFire geoFire = new GeoFire(ref);
         geoFire.removeLocation(userId);
+    }
+    public static double distFrom(double lat1, double lng1, double lat2, double lng2) {
+        double earthRadius = 3958.75; // miles (or 6371.0 kilometers)
+        double dLat = Math.toRadians(lat2-lat1);
+        double dLng = Math.toRadians(lng2-lng1);
+        double sindLat = Math.sin(dLat / 2);
+        double sindLng = Math.sin(dLng / 2);
+        double a = Math.pow(sindLat, 2) + Math.pow(sindLng, 2)
+                * Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2));
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        double dist = earthRadius * c;
+
+        return dist;
     }
 }
