@@ -1,7 +1,12 @@
 package com.iamaravind.datasaveandauth;
 
+import android.app.NotificationManager;
+import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.media.AudioManager;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -79,6 +84,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onMyLocationChange(Location location) {
                 Log.e("sdhfgjshdf","changed");
 
+                //Profile Change
+                AudioManager am = (AudioManager)getSystemService(AUDIO_SERVICE);
                 mLastLocation = location;
 
                 LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
@@ -100,12 +107,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
               //  Toast.makeText(MapsActivity.this, "Result is this = "+results[0],Toast.LENGTH_SHORT).show();
                 if(results[0]<30)
                 {
-                    if(flag){Toast.makeText(MapsActivity.this, "Within The Radius",Toast.LENGTH_SHORT).show(); flag=false;}
+                    if(flag){Toast.makeText(MapsActivity.this, "Silent Within The Radius",Toast.LENGTH_SHORT).show(); flag=false;
+                        am.setRingerMode(am.RINGER_MODE_VIBRATE);}
                 }
                 else {
                     if(!flag){
-                    Toast.makeText(MapsActivity.this, "NOT Within The Radius",Toast.LENGTH_SHORT).show();
-                    flag = true;}
+                    Toast.makeText(MapsActivity.this, "Normal NOT Within The Radius",Toast.LENGTH_SHORT).show();
+                    flag = true;
+                        am.setRingerMode(am.RINGER_MODE_NORMAL);}
                 }
             }
         });
@@ -142,7 +151,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(1000);
         mLocationRequest.setFastestInterval(1000);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
 
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             //Log.e("sdhfgjshdf","noper");
@@ -161,7 +170,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Log.e("sdhfgjshdf","fail;ed");
     }
 
-    @Override
+   /* @Override
     protected void onStop() {
         super.onStop();
 
@@ -170,7 +179,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         GeoFire geoFire = new GeoFire(ref);
         geoFire.removeLocation(userId);
-    }
+    }*/
     public static double distFrom(double lat1, double lng1, double lat2, double lng2) {
         double earthRadius = 3958.75; // miles (or 6371.0 kilometers)
         double dLat = Math.toRadians(lat2-lat1);
@@ -184,4 +193,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         return dist;
     }
+   /* public void changeProf()
+    {
+        NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)&& (!notificationManager.isNotificationPolicyAccessGranted())){
+            Intent intent = new Intent(
+                    android.provider.Settings
+                            .ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS);
+
+            startActivity(intent);}
+        AudioManager am = (AudioManager)getSystemService(AUDIO_SERVICE);
+
+        switch (am.getRingerMode())
+        {
+            case AudioManager.RINGER_MODE_NORMAL:
+                                        am.setRingerMode(am.RINGER_MODE_VIBRATE);
+                                        break;
+            case AudioManager.RINGER_MODE_VIBRATE:
+                                        am.setRingerMode(am.RINGER_MODE_NORMAL);
+                                        break;
+        }
+    }*/
 }
